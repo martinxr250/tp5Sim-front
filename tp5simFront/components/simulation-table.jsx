@@ -36,24 +36,27 @@ export function SimulationTable({ data, currentRange, totalEvents, onRangeChange
   }
 
   const getEventBadgeColor = (evento) => {
-    switch (evento) {
-      case "LLEGADA_AUTO":
-        return "bg-blue-100 text-blue-800 border-blue-200"
-      case "SALIDA_AUTO":
-        return "bg-green-100 text-green-800 border-green-200"
-      case "FIN_COBRO":
-        return "bg-purple-100 text-purple-800 border-purple-200"
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
-    }
-  }
+  if (!evento) return "bg-gray-100 text-gray-800 border-gray-200"
+  if (evento.startsWith("LLEGADA_AUTO")) return "bg-blue-100 text-blue-800 border-blue-200"
+  if (evento.startsWith("SALIDA_AUTO")) return "bg-green-100 text-green-800 border-green-200"
+  if (evento.startsWith("FIN_COBRO")) return "bg-purple-100 text-purple-800 border-purple-200"
+  return "bg-gray-100 text-gray-800 border-gray-200"
+}
 
   const getAutoTypeBadge = (tipo) => {
-    if (!tipo) return null
-    return tipo === "GRANDE"
-      ? "bg-red-100 text-red-800 border-red-200"
-      : "bg-yellow-100 text-yellow-800 border-yellow-200"
+  if (!tipo) return null
+
+  if (tipo === "GRANDE") {
+    return "bg-red-100 text-red-800 border-red-200"
+  } else if (tipo === "PEQUENIO") {
+    return "bg-yellow-100 text-yellow-800 border-yellow-200"
+  } else if (tipo === "UTILITARIO") {
+    return "bg-green-100 text-green-800 border-green-200"
+  } else {
+    return null // o algún color por defecto
   }
+}
+
 
   const formatNumber = (num) => {
     if (num === null || num === undefined) return "-"
@@ -97,19 +100,25 @@ export function SimulationTable({ data, currentRange, totalEvents, onRangeChange
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="w-full">
               <TableHeader>
                 <TableRow className="bg-gray-50/50">
-                  <TableHead className="font-semibold text-gray-700 w-20">Iter.</TableHead>
+                  <TableHead className="font-semibold text-gray-700 w-16">Iter.</TableHead>
                   <TableHead className="font-semibold text-gray-700">Evento</TableHead>
                   <TableHead className="font-semibold text-gray-700">Reloj</TableHead>
+                  <TableHead className="font-semibold text-gray-700">RND Llegada</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Tiempo Llegada</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Hora Llegada</TableHead>
+                  <TableHead className="font-semibold text-gray-700">RND Tipo</TableHead>
                   <TableHead className="font-semibold text-gray-700">Tipo Auto</TableHead>
+                  <TableHead className="font-semibold text-gray-700">RND Tiempo</TableHead>
                   <TableHead className="font-semibold text-gray-700">T. Est.</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Cola</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Cola Cobro</TableHead>
                   <TableHead className="font-semibold text-gray-700">Sectores</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Runge-Kutta</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Demora Cobro</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Fin Cobro</TableHead>
                   <TableHead className="font-semibold text-gray-700">Ganancia</TableHead>
-                  <TableHead className="font-semibold text-gray-700 w-24">Acciones</TableHead>
+                  <TableHead className="font-semibold text-gray-700 w-20">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -135,6 +144,14 @@ export function SimulationTable({ data, currentRange, totalEvents, onRangeChange
                         </div>
                       </TableCell>
 
+                      <TableCell className="font-mono text-xs">{formatNumber(event.rndLlegadaAuto)}</TableCell>
+
+                      <TableCell className="font-mono text-xs">{formatNumber(event.tiempoLlegadaAuto)}</TableCell>
+
+                      <TableCell className="font-mono text-xs">{formatNumber(event.horaLlegadaAuto)}</TableCell>
+
+                      <TableCell className="font-mono text-xs">{formatNumber(event.rndTipoAuto)}</TableCell>
+
                       <TableCell>
                         {event.tipoAuto && (
                           <Badge className={getAutoTypeBadge(event.tipoAuto)} variant="outline">
@@ -142,6 +159,8 @@ export function SimulationTable({ data, currentRange, totalEvents, onRangeChange
                           </Badge>
                         )}
                       </TableCell>
+
+                      <TableCell className="font-mono text-xs">{formatNumber(event.rndTiempo)}</TableCell>
 
                       <TableCell className="font-mono text-sm">{event.tiempoEstacionamiento || "-"}</TableCell>
 
@@ -168,22 +187,16 @@ export function SimulationTable({ data, currentRange, totalEvents, onRangeChange
                         {hasRungeKutta ? (
                           <div className="flex items-center gap-1">
                             <TrendingUp className="w-3 h-3 text-purple-500" />
-                            <span className="font-mono text-sm text-purple-700">
-                              {formatNumber(event.valorRungeKutta)}
-                            </span>
-                            {event.matriz && event.matriz.length > 0 && (
-                              <Badge
-                                variant="outline"
-                                className="ml-1 text-xs bg-orange-50 text-orange-700 border-orange-200"
-                              >
-                                Matriz
-                              </Badge>
-                            )}
+                            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                              Aplicado
+                            </Badge>
                           </div>
                         ) : (
                           <span className="text-gray-400 text-sm">-</span>
                         )}
                       </TableCell>
+
+                      <TableCell className="font-mono text-sm">{formatNumber(event.finCobroAuto)}</TableCell>
 
                       <TableCell className="font-mono text-sm">
                         {event.acumuladorGanancia !== null && event.acumuladorGanancia !== undefined

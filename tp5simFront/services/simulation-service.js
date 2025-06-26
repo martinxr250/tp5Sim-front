@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://068c-200-110-196-177.ngrok-free.app"
+const API_BASE_URL = "http://localhost:8080";
 
 export const simulationService = {
   async runSimulation({ cantidadIteraciones, parametroT, saltoH, filaDesde, filaHasta }) {

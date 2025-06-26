@@ -11,11 +11,11 @@ import { simulationService } from "../services/simulation-service"
 
 export function SimulationControls({ onSimulationComplete, loading, setLoading }) {
   const [params, setParams] = useState({
-    cantidadIteraciones: 5,
+    cantidadIteraciones: 1000,
     parametroT: 100,
     saltoH: 0.1,
-    filaDesde: 1,
-    filaHasta: 10,
+    filaDesde: 0,
+    filaHasta: 300,
   })
   const [error, setError] = useState(null)
 
@@ -31,7 +31,7 @@ export function SimulationControls({ onSimulationComplete, loading, setLoading }
   const validateParams = () => {
     const errors = []
 
-    if (params.cantidadIteraciones < 1) errors.push("Cantidad de iteraciones debe ser mayor a 0")
+    if (params.cantidadIteraciones < 0) errors.push("Cantidad de iteraciones debe ser mayor a 0")
     if (params.parametroT < 1) errors.push("Parámetro T debe ser mayor a 0")
     if (params.saltoH <= 0) errors.push("Salto H debe ser mayor a 0")
     if (params.filaDesde < 0) errors.push("Fila Desde debe ser mayor a 0")
@@ -184,11 +184,11 @@ export function SimulationControls({ onSimulationComplete, loading, setLoading }
             variant="outline"
             onClick={() => {
               setParams({
-                cantidadIteraciones: 5,
+                cantidadIteraciones: 1000,
                 parametroT: 100,
                 saltoH: 0.1,
-                filaDesde: 1,
-                filaHasta: 10,
+                filaDesde: 0,
+                filaHasta: 300,
               })
               setError(null)
             }}
@@ -198,16 +198,7 @@ export function SimulationControls({ onSimulationComplete, loading, setLoading }
           </Button>
         </div>
 
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-800">
-            <strong>URL que se llamará:</strong>
-            <br />
-            <code className="text-xs break-all">
-              https://068c-200-110-196-177.ngrok-free.app/simular/{params.cantidadIteraciones}/{params.parametroT}/
-              {params.saltoH}/{params.filaDesde}/{params.filaHasta}/
-            </code>
-          </p>
-        </div>
+        
       </CardContent>
     </Card>
   )

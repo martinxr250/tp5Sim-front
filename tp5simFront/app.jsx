@@ -28,10 +28,10 @@ export default function App() {
         <Card>
           <CardHeader>
             <CardTitle className="text-3xl font-bold text-center">
-              Trabajo Práctico N°5 - PELADO SUBIME LA NOTA
+              Trabajo Práctico N°5 - Grupo 13
             </CardTitle>
             <CardDescription className="text-center text-lg">
-              Sistema que te rompe la Cola EN la Playa de Estacionamiento
+              Sistema de Colas en Playa de Estacionamiento
             </CardDescription>
           </CardHeader>
         </Card>

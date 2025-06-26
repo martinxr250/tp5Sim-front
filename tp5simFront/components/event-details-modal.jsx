@@ -16,28 +16,66 @@ export function EventDetailsModal({ event, isOpen, onClose }) {
     return value.toString()
   }
 
+  const getEstadoText = (esLibre) => {
+    return esLibre ? "Libre" : "Ocupado"
+  }
+
   const sectoresLibres = event.sectorDTOS?.filter((s) => s.esLibre).length || 0
   const totalSectores = event.sectorDTOS?.length || 0
 
   const getEventBadgeColor = (evento) => {
-    switch (evento) {
-      case "LLEGADA_AUTO":
-        return "bg-blue-100 text-blue-800 border-blue-200"
-      case "SALIDA_AUTO":
-        return "bg-green-100 text-green-800 border-green-200"
-      case "FIN_COBRO":
-        return "bg-purple-100 text-purple-800 border-purple-200"
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
-    }
-  }
+  if (!evento) return "bg-gray-100 text-gray-800 border-gray-200"
+  if (evento.startsWith("LLEGADA_AUTO")) return "bg-blue-100 text-blue-800 border-blue-200"
+  if (evento.startsWith("SALIDA_AUTO")) return "bg-green-100 text-green-800 border-green-200"
+  if (evento.startsWith("FIN_COBRO")) return "bg-purple-100 text-purple-800 border-purple-200"
+  return "bg-gray-100 text-gray-800 border-gray-200"
+}
 
-  const getAutoTypeBadge = (tipo) => {
-    if (!tipo) return "bg-gray-100 text-gray-800"
-    return tipo === "GRANDE"
-      ? "bg-red-100 text-red-800 border-red-200"
-      : "bg-yellow-100 text-yellow-800 border-yellow-200"
+
+
+
+ const getAutoTypeBadge = (tipo) => {
+  if (!tipo) return "bg-gray-100 text-gray-800"
+
+  if (tipo === "GRANDE") {
+    return "bg-red-100 text-red-800 border-red-200"
+  } else if (tipo === "PEQUENIO") {
+    return "bg-yellow-100 text-yellow-800 border-yellow-200"
+  } else if (tipo === "UTILITARIO") {
+    return "bg-green-100 text-green-800 border-green-200"
+  } else {
+    return "bg-gray-100 text-gray-800"
   }
+}
+
+
+const calcularMontoPagar = (auto) => {
+  if (!auto || (auto.horaFinEstacionamiento - auto.horaInicioEstacionamiento) == null) return "N/A";
+
+  // Tarifas por hora según el tipo de auto
+  const tarifas = {
+    PEQUENIO: 300,
+    GRANDE: 500,
+    UTILITARIO: 1000,
+  };
+
+  const tipo = auto.tipoAuto?.toUpperCase();
+  const tarifaPorHora = tarifas[tipo];
+
+  if (!tarifaPorHora) return "Tipo de auto no válido";
+
+  // Convertimos minutos a horas
+  const horas = (auto.horaFinEstacionamiento - auto.horaInicioEstacionamiento) / 60;
+
+  // Calculamos el monto total
+  const montoTotal = tarifaPorHora * horas;
+
+  // Devolvemos el monto con dos decimales
+  return montoTotal.toFixed(2);
+};
+
+
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -53,12 +91,12 @@ export function EventDetailsModal({ event, isOpen, onClose }) {
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Información Principal */}
+          {/* Información Principal del Estado */}
           <Card className="shadow-sm">
             <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Clock className="w-5 h-5 text-blue-600" />
-                Información Principal del Evento
+                Estado del Sistema
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
@@ -75,14 +113,14 @@ export function EventDetailsModal({ event, isOpen, onClose }) {
                     <TableCell className="font-mono">{formatValue(event.reloj)}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell className="font-semibold">Es Libre</TableCell>
+                    <TableCell className="font-semibold">Estado Playa</TableCell>
                     <TableCell>
-                      <Badge variant={event.esLibre ? "default" : "destructive"}>{formatValue(event.esLibre)}</Badge>
+                      <Badge variant={event.esLibre ? "default" : "destructive"}>{getEstadoText(event.esLibre)}</Badge>
                     </TableCell>
-                    <TableCell className="font-semibold">Está Libre</TableCell>
+                    <TableCell className="font-semibold">Estado Ventanilla Cobro</TableCell>
                     <TableCell>
                       <Badge variant={event.estaLibre ? "default" : "destructive"}>
-                        {formatValue(event.estaLibre)}
+                        {getEstadoText(event.estaLibre)}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -101,7 +139,7 @@ export function EventDetailsModal({ event, isOpen, onClose }) {
                     <TableCell className="font-mono">{formatValue(event.tiempoEstacionamiento)}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell className="font-semibold">Autos en Cola</TableCell>
+                    <TableCell className="font-semibold">Autos en Cola Cobro</TableCell>
                     <TableCell>
                       <Badge variant="secondary">{event.autosEnCola}</Badge>
                     </TableCell>
@@ -115,40 +153,6 @@ export function EventDetailsModal({ event, isOpen, onClose }) {
             </CardContent>
           </Card>
 
-          {/* Números Aleatorios y Tiempos */}
-          <Card className="shadow-sm">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Calculator className="w-5 h-5 text-green-600" />
-                Números Aleatorios y Cálculos de Tiempo
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <Table>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-semibold w-1/4">RND Llegada Auto</TableCell>
-                    <TableCell className="font-mono">{formatValue(event.rndLlegadaAuto)}</TableCell>
-                    <TableCell className="font-semibold">Tiempo Llegada Auto</TableCell>
-                    <TableCell className="font-mono">{formatValue(event.tiempoLlegadaAuto)}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-semibold">RND Tipo Auto</TableCell>
-                    <TableCell className="font-mono">{formatValue(event.rndTipoAuto)}</TableCell>
-                    <TableCell className="font-semibold">Hora Llegada Auto</TableCell>
-                    <TableCell className="font-mono">{formatValue(event.horaLlegadaAuto)}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-semibold">RND Tiempo</TableCell>
-                    <TableCell className="font-mono">{formatValue(event.rndTiempo)}</TableCell>
-                    <TableCell className="font-semibold">Fin Cobro Auto</TableCell>
-                    <TableCell className="font-mono">{formatValue(event.finCobroAuto)}</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-
           {/* Valores Especiales */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Runge-Kutta */}
@@ -156,7 +160,7 @@ export function EventDetailsModal({ event, isOpen, onClose }) {
               <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-purple-600" />
-                  Valor Runge-Kutta
+                  Demora Cobro (Runge-Kutta)
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
@@ -211,7 +215,7 @@ export function EventDetailsModal({ event, isOpen, onClose }) {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-semibold">Tiempo Estacionamiento</TableCell>
+                      <TableCell className="font-semibold">Tiempo Estacionamiento Ocupacion 100%</TableCell>
                       <TableCell className="font-mono">{formatValue(event.acumuladorTiempoEstacionamiento)}</TableCell>
                     </TableRow>
                   </TableBody>
@@ -236,7 +240,7 @@ export function EventDetailsModal({ event, isOpen, onClose }) {
                 <div className="mb-4 p-3 bg-orange-50 rounded-lg border border-orange-200">
                   <p className="text-sm text-orange-800">
                     <strong>Método Numérico:</strong> Esta matriz muestra los pasos del método Runge-Kutta aplicado para
-                    resolver la ecuación diferencial del sistema.
+                    calcular la demora en el cobro del sistema.
                   </p>
                 </div>
                 <div className="overflow-x-auto">
@@ -276,7 +280,7 @@ export function EventDetailsModal({ event, isOpen, onClose }) {
                             {typeof fila[5] === "number" ? fila[5].toFixed(6) : fila[5]}
                           </TableCell>
                           <TableCell className="text-center font-mono text-sm">
-                            {typeof fila[7] === "number" ? fila[7].toFixed(6) : fila[7]}
+                            {typeof fila[6] === "number" ? fila[6].toFixed(6) : fila[6]}
                           </TableCell>
                           <TableCell className="text-center font-mono text-sm">
                             {typeof fila[7] === "number" ? fila[7].toFixed(6) : fila[7]}
@@ -365,6 +369,7 @@ export function EventDetailsModal({ event, isOpen, onClose }) {
                       <TableHead>Tipo</TableHead>
                       <TableHead>Sector</TableHead>
                       <TableHead>Hora Fin Estacionamiento</TableHead>
+                      <TableHead>Monto a Pagar</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -385,6 +390,9 @@ export function EventDetailsModal({ event, isOpen, onClose }) {
                           <Badge variant="secondary">Sector {auto.idSector}</Badge>
                         </TableCell>
                         <TableCell className="font-mono">{formatValue(auto.horaFinEstacionamiento)}</TableCell>
+                        <TableCell className="font-mono font-semibold text-green-700">
+                          ${calcularMontoPagar(auto, event.tiempoEstacionamiento)}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
