@@ -12,11 +12,11 @@ import { LoadingModal } from "./loading-modal"
 
 export function SimulationControls({ onSimulationComplete, loading, setLoading }) {
   const [params, setParams] = useState({
-    cantidadIteraciones: 5,
+    cantidadIteraciones: 100,
     parametroT: 100,
     saltoH: 0.1,
-    filaDesde: 1,
-    filaHasta: 10,
+    filaDesde: 0,
+    filaHasta: 300,
   })
   const [error, setError] = useState(null)
   const [showLoadingModal, setShowLoadingModal] = useState(false)
@@ -33,10 +33,10 @@ export function SimulationControls({ onSimulationComplete, loading, setLoading }
   const validateParams = () => {
     const errors = []
 
-    if (params.cantidadIteraciones < 1) errors.push("Cantidad de iteraciones debe ser mayor a 0")
+    if (params.cantidadIteraciones < 0) errors.push("Cantidad de iteraciones debe ser mayor a 0")
     if (params.parametroT < 1) errors.push("Parámetro T debe ser mayor a 0")
     if (params.saltoH <= 0) errors.push("Salto H debe ser mayor a 0")
-    if (params.filaDesde < 1) errors.push("Fila Desde debe ser mayor a 0")
+    if (params.filaDesde < 0) errors.push("Fila Desde debe ser mayor a 0")
     if (params.filaHasta < params.filaDesde) errors.push("Fila Hasta debe ser mayor o igual a Fila Desde")
 
     return errors
@@ -206,11 +206,11 @@ export function SimulationControls({ onSimulationComplete, loading, setLoading }
               variant="outline"
               onClick={() => {
                 setParams({
-                  cantidadIteraciones: 5,
+                  cantidadIteraciones: 100,
                   parametroT: 100,
                   saltoH: 0.1,
-                  filaDesde: 1,
-                  filaHasta: 10,
+                  filaDesde: 0,
+                  filaHasta: 300,
                 })
                 setError(null)
               }}
