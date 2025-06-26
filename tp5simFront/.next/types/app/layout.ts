@@ -1,4 +1,4 @@
-// File: C:\Users\Flia-Uliana\Documents\UTN 2025\Simulacion\tp5Sim-front\tp5simFront\app\layout.tsx
+// File: C:\Users\Castr\OneDrive\Escritorio\tp5Sim-front\tp5simFront\app\layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

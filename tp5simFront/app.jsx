@@ -23,28 +23,36 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <Card>
+    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
+      <div className="w-full max-w-none space-y-4 lg:space-y-6">
+        <Card className="mx-auto max-w-4xl">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold text-center">
+            <CardTitle className="text-2xl sm:text-3xl font-bold text-center">
               Trabajo Práctico N°5 - Grupo 13
             </CardTitle>
-            <CardDescription className="text-center text-lg">
+            <CardDescription className="text-center text-base sm:text-lg">
               Sistema de Colas en Playa de Estacionamiento
             </CardDescription>
           </CardHeader>
         </Card>
 
-        <SimulationControls onSimulationComplete={handleSimulationComplete} loading={loading} setLoading={setLoading} />
+        <div className="mx-auto max-w-6xl">
+          <SimulationControls
+            onSimulationComplete={handleSimulationComplete}
+            loading={loading}
+            setLoading={setLoading}
+          />
+        </div>
 
         {simulationData.length > 0 && (
-          <SimulationTable
-            data={simulationData}
-            currentRange={currentRange}
-            totalEvents={totalEvents}
-            onRangeChange={handleRangeChange}
-          />
+          <div className="w-full">
+            <SimulationTable
+              data={simulationData}
+              currentRange={currentRange}
+              totalEvents={totalEvents}
+              onRangeChange={handleRangeChange}
+            />
+          </div>
         )}
       </div>
     </div>
