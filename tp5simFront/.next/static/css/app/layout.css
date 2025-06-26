@@ -1246,9 +1246,6 @@ video {
 .break-words {
   overflow-wrap: break-word;
 }
-.break-all {
-  word-break: break-all;
-}
 .rounded-\[2px\] {
   border-radius: 2px;
 }
